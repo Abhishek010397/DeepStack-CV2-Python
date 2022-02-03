@@ -1,6 +1,11 @@
+from flask import Flask, render_template, Response
 import cv2
 from deepstack_sdk import ServerConfig, Detection
 
+config = ServerConfig("http://localhost:80")
+detection = Detection(config)
+app = Flask(__name__)
+camera = cv2.VideoCapture(0)
 
 def draw_detections(img, detections):
     for detection in detections:
@@ -25,18 +30,28 @@ def draw_detections(img, detections):
     return img
 
 
-if __name__ == "__main__":
-    config = ServerConfig("http://localhost:80")
-    detection = Detection(config)
-    capture = cv2.VideoCapture(0)
 
-    while (True):
-        ret, frame = capture.read()
-        if ret:
+def gen_frames():
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        else:
             detections = detection.detectObject(frame, output=None)
             frame = draw_detections(frame, detections)
-            cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    capture.release()
-    cv2.destroyAllWindows()
+            ret, buffer = cv2.imencode('.jpeg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
