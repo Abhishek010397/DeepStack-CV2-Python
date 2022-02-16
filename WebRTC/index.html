@@ -1,0 +1,63 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC demo</title>
+    <style>
+    button {
+        padding: 8px 16px;
+    }
+
+    pre {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    video {
+        width: 100%;
+    }
+
+    .option {
+        margin-bottom: 8px;
+    }
+
+    #media {
+        max-width: 1280px;
+    }
+    </style>
+</head>
+<body>
+
+<div class="option">
+    <input type="hidden" id="use-datachannel" checked="checked">
+    <input type = "hidden" name = "datachannel-parameters" id = "datachannel-parameters" value='{"ordered": true}'/>
+</div>
+<div class="option">
+    <input type="hidden" id="use-video" checked="checked">
+    <input type = "hidden" name = "video-resolution" id = "video-resolution" value="640x480"/>
+    <input type = "hidden" name = "video-transform" id = "video-transform" value="none"/>
+    <input type = "hidden" name = "video-codec" id = "video-codec" value="H264/90000"/>
+</div>
+<div class="option">
+    <input type="hidden" id="use-stun" type="checkbox"/>
+<!--    <label for="use-stun">Use STUN server</label>-->
+</div>
+
+<button id="start" onclick="start()">Start</button>
+<button id="stop" style="display: none" onclick="stop()">Stop</button>
+
+<p><span hidden id="ice-gathering-state"></span></p>
+<p><span hidden id="ice-connection-state"></span></p>
+<p><span hidden id="signaling-state"></span></p>
+
+<div id="media" style="display: none">
+    <audio id="audio" autoplay="false"></audio>
+    <video id="video" width="640" height="480" autoplay="true" playsinline="true"></video>
+</div>
+<pre hidden id="data-channel" style="height: 200px;"></pre>
+<pre hidden id="offer-sdp"></pre>
+<pre hidden id="answer-sdp"></pre>
+<script src="client.js"></script>
+</body>
+</html>
+
